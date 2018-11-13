@@ -1,0 +1,26 @@
+version: '2'
+services:
+
+  fbredis:
+    build: ./fbredis/
+    container_name: fbredis
+    logging:
+      driver: none
+    networks:
+      - fbook
+    ports:
+     - "0.0.0.0:6380:6379"
+
+  fbapirest:
+    build: ./fbapirest/
+    #logging:
+    #driver: none
+    container_name: fbapirest
+    volumes:
+     - ./fbapirest/code:/home/app/code
+    networks:
+      - fbook
+
+networks:
+  fbook:
+    driver: bridge
