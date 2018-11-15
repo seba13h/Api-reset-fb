@@ -16,10 +16,10 @@ services:
     #logging:
     #driver: none
     container_name: fbapirest
-    volumes:
-     - ./fbapirest/code:/home/app/code
     networks:
       - fbook
+    ports:
+     - "127.0.0.1:8081:80"
 
 networks:
   fbook:

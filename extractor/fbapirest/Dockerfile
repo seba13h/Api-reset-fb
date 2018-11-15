@@ -1,9 +1,7 @@
 FROM phusion/passenger-customizable:0.9.32
 ENV HOME /root
 
-CMD ["npm" , "start"]
-
-EXPOSE 8080
+CMD ["/sbin/my_init"]
 
 ENV LANGUAGE en_US.UTF-8
 ENV LANG en_US.UTF-8
@@ -14,25 +12,17 @@ ENV TERM xterm
 RUN apt-get update
 
 RUN /pd_build/utilities.sh
+RUN /pd_build/nodejs.sh
 
-RUN apt-get install -y nano wget
-
-RUN wget https://deb.nodesource.com/setup_11.x
-
-RUN bash setup_11.x
-
-RUN apt-get install -y nodejs
-
-COPY package.json ./
-
-RUN npm install
+RUN apt-get install -y nano
 
 RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
-
-
 
 # Disable cron
 RUN echo manual | tee /etc/init/cron.override
 
+EXPOSE 80
+
 VOLUME /home/app/code
 WORKDIR /home/app/code
+
