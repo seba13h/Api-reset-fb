@@ -16,6 +16,8 @@ services:
     #logging:
     #driver: none
     container_name: fbapirest
+    volumes:
+     - ./fbapirest/code:/home/app/code
     networks:
       - fbook
     ports:
