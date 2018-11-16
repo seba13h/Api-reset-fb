@@ -11,7 +11,6 @@ app.use(bodyParser.json());
 app.post('/controller/addFanpage', function (req, res) {
   console.log(req.body);
   res.status(200).send({ message: 'se recibe la fp'});
-  
   let key = req.body.key;
   let fanpagesName = req.body.name;
   redisClient.sadd(key, fanpagesName);
@@ -19,12 +18,16 @@ app.post('/controller/addFanpage', function (req, res) {
 });
 
 app.get('/controller/listAllFanpage', function (req, res){
-	res.send(200, {fanpages: redisClient.smembers('fanpages')});
-
+	redisClient.smembers('fanpages',function(err, reply){
+		res.send(200, {fanpages: reply});
+	})
 });
 
 app.delete('/controller/deleteFanpage/:idFp', function (req, res){
-
+	let key = req.params.idFp;
+	console.log(key);
+	redisClient.DEL(key);
+	console.log('borrado');
 });
 
 //conexion con redis
