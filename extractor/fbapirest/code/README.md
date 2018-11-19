@@ -1,7 +1,4 @@
-Nombre End point
-
-app.post('/controller/addFanpage
-
-app.get('/controller/listAllFanpage'
-
-app.delete('/controller/deleteFanpage/:idFp
+##instalar dependencias package.json
+docke-compose run fbapirest npm install 
+##Iniciar servidor node
+docker exec -it fbapirest node app.js
