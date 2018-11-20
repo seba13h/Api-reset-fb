@@ -7,190 +7,283 @@ var bodyParser  = require("body-parser");
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
-//end points fan pages
-
-//add
+/*-------------------> End points fan pages <-----------------------------
+*
+*                       Agrega una fanpage
+*                       ==================
+*/
 app.post('/v1.0/fanpage/add', function (req, res) {
   let fanpageUrl = req.body.url;	
-  let resultado = 0;
+   
+   async.waterfall([
   		/*
-  		*Validamos si existe en fanpages
-  		*/
-  		redisClient.sismember("fanpageValidadas", fanpageUrl, function (req, res){
-  			if(res == 1){
-  				console.log(fanpageUrl + ' es una fanpage validada');
-  				res.send(200, fanpageUrl + ' es una fanpage validada' );
-  				resultado = 1;
-  			}else{
-  				resultado = 0;
-  			}
-  		});
-  		redisClient.sismember("fanpageNoValidadas", fanpageUrl, function (req, res){
-  			if (res == 1 ){
-  				console.log(fanpageUrl + ' es una fanpage no validada');
-  				res.send(200, fanpageUrl + ' es una fanpage no validada' );
-  				resultado = 1;	
-  			}
-  		});
-
-  		redisClient.sismember("fanpageErroneas", fanpageUrl, function (req, res){
-  			if (res == 1){
-  				console.log(fanpageUrl + ' es una fanpage erronea');
-  				res.send(200, fanpageUrl + ' es una fanpage erronea' );
-  				resultado = 1;
-  			}			
-  		});
+  		* Validamos si existe en fanpages
+  		* resultado =  0: no existe
+  		*             1: existe
+  		*/	
+  		function getFanpagesValidadas(cb){
+  			let resultado = 0;
+  			redisClient.sismember("fanpages_redis", fanpageUrl,(err, reply)=>{
+  				if(reply == 1){
+  					resultado = 1;
+  					res.send(200, fanpageUrl + ' es una fanpage validada' );
+  					return cb({error:true, mesagge: 'es una fanpage validada'});
+  				}else{
+  					return cb(null, resultado);
+  				}
+  			});
+  		},
+  		function getFanpagesNoValidadas(resultado,cb){
+  			redisClient.sismember("fanpages_no_validadas", fanpageUrl,(err, reply)=>{
+  				if (reply == 1 ){
+  					resultado = 1;
+  					res.send(200, fanpageUrl + ' es una fanpage no validada');
+  					return cb({error:true, mesagge: 'es una fanpage no validada'});			
+  				}else{
+  					return cb(null, resultado);
+  				}
+  			});
+  		},
+  		function getFanpagesError(resultado,cb){
+  			redisClient.sismember("fanpages_error", fanpageUrl,(err, reply)=>{
+  				if (reply == 1){
+  					res.send(200, fanpageUrl + ' es una fanpage erronea' );
+  					resultado = 1;
+  					return cb({error:true, mesagge: 'es una fanpage con error'});	
+  				}else{
+  					return cb(null, resultado);
+  				}
+  			});
+  		},
   		/*
-  		* verifica que no existe la fanpage y la agrega
+  		* Si resultado = 0 entonces agrega la fan page
   		*/
-	    if(resultado == 0){
-  			redisClient.sadd('fanpagesNoValidadas', fanpageUrl);
-  			console.log('se agrego :' + fanpageUrl);
-  			res.send(200, 'se agrego :' + fanpageUrl );
-  		} 	
-
+  		function addFanpages(resultado,cb){
+	    	if(resultado == 0){
+  				redisClient.sadd('fanpages_no_validadas', fanpageUrl);
+  					res.send(200, { mesagge: 'se agrego :' + fanpageUrl });
+  			} 
+  		}
+   	]);  		
 });
-
-//delete
+/*
+*                      Elimina Fanpage
+*                      ===============
+*
+*/
 app.delete('/v1.0/fanpage/delete/:urlFp', function (req, res){
 	let url = req.params.urlFp;
-	
-	redisClient.SREM("fanpagesValidadas", url);
-	redisClient.SREM("fanpagesNoValidadas", url);
-	redisClient.SREM("fanpagesErroneas", url);
-	redisClient.HDEL("ErroresFanPages", url);
-	console.log('borrando' + url);
+	redisClient.SREM("fanpages_redis", url);
+	redisClient.SREM("fanpages_no_validadas", url);
+	redisClient.SREM("fanpages_error", url);
+	redisClient.HDEL("errores_fanpages", url);
+	console.log('borrando: '  + url);
 	res.send(200, {mesagge: 'se borro exitosamente'} );
 	
 });
-
-//Listar fan pages
+/*
+*                  Listar fan pages
+*                  ================
+*/ 
 app.get('/v1.0/fanpage/listAll', function (req, res){
 	let arrayFanpages = [];
-	redisClient.smembers('fanpagesValidadas',function(err, reply){
+	
+	/*
+	* arrayFanpages = array que contendra todas las fanpages  
+	*/
+
+	redisClient.smembers('fanpages_redis',function(err, reply){
 		arrayFanpages= arrayFanpages.concat(reply);
 	});
-	redisClient.smembers('fanpagesNoValidadas',function(err, reply){
+	redisClient.smembers('fanpages_no_validadas',function(err, reply){
 		arrayFanpages= arrayFanpages.concat(reply);	
 	});
-	redisClient.smembers('fanpagesErroneas',function(err, reply){
+	redisClient.smembers('fanpages_error',function(err, reply){
 		arrayFanpages= arrayFanpages.concat(reply);
-		//devolver json de todas las fp	
-		console.log(arrayFanpages);
+	
+		/*
+		* Devolver json de todas las fanpages
+		*/
+
 		res.send(200, {arrayFanpages});
 	});		
 });
 
-
+/*
+*               Listar fanpages con error
+*               =========================
+*/
 
 app.get('/v1.0/fanpage/listError', function (req, res){
 	let arrayFanpages = [];
-	redisClient.smembers('fanpagesError',function(err, reply){
+	
+	/*
+	*  ArrayFanpages = array que contendra todas las fanpages  
+	*/
+
+	redisClient.smembers('fanpages_error',function(err, reply){
 		arrayFanpages= arrayFanpages.concat(reply);
 	});
-	redisClient.hgetAll('ErroresFanPages', function(err, reply){
+	redisClient.hgetAll('errores_fanpages', function(err, reply){
 		arrayFanpages= arrayFanpages.concat(reply);
-		console.log(arrayFanpages);
+		console.log(arrayFanpages)
+		
 		res.send(200, {arrayFanpages});
 	});
-
-	//juntar los 2 array, la idea es mostrar la fp con el error.
+	
+	/*
+	* Devolver json de las fp con error
+	*/
 });
 
-
+/*
+*               Listar las fanpages sin error 
+*               =============================
+*/
 
 app.get('/v1.0/fanpage/listNoError', function (req, res){
 	let arrayFanpages = [];
-	redisClient.smembers('fanpagesValidadas',function(err, reply){
+	/*
+	* arrayFanpages contendra las fanpage sin error
+	*/
+	redisClient.smembers('fanpages_redis',function(err, reply){
 		arrayFanpages= arrayFanpages.concat(reply);
 	});
-	redisClient.smembers('fanpagesNoValidadas',function(err, reply){
+	redisClient.smembers('fanpages_no_validadas',function(err, reply){
+		/*
+		* Une las fansPages sin validar con las validadas y retorna un array
+		*/
 		arrayFanpages= arrayFanpages.concat(reply);	
-		console.log(arrayFanpages);
 		res.send(200, {arrayFanpages});
 	});
-	//devolver json con fp sin errores
 });
+
+/*
+*                 Lista las fanpages no validadas
+*                 ===============================
+*/
 
 app.get('/v1.0/fanpage/listUnvalidated', function (req, res){
-	redisClient.smembers('fanpagesSinValidar',function(err, reply){
+	redisClient.smembers('fanpages_no_validadas',function(err, reply){
+		/*
+		* Devuelve un json con las fanspages sin validar
+		*/
 		res.send(200, {fanpagessinvalidar: reply});
 	});
-	//devolver json con fp sin validar
 });
 
-//end point tokens
-//add
+/*
+*----------------------> End point tokens <--------------------------------
+*
+*                          Agregar token
+*                          =============
+*/
+
 app.post('/v1.0/token/add', function (req, res) {
   
   let token = req.body.token;
-  let resultado = 0;
+  async.waterfall([
   		/*
-  		*Validamos si existe en fanpages
-  		*/
-  		redisClient.sismember('tokenValidados', token, function (err, res){
-  			if(res == 1){
-  				console.log(token + ' es un token validado');
-  				res.send(200, token + ' es un token validado' );
-  				resultado = 1;
-  			}else{
-  				resultado = 0;
-  			}
-  		});
-  		redisClient.sismember("tokenErroneos", token, function (err, res){
-  			if (res == 1 ){
-  				console.log(token + ' es un token erroneo');
-  				res.send(200, token + ' es un token erroneo' );
-  				resultado = 1;	
-  			}
-  		});
-
-  		redisClient.sismember("tokenNoValidados", token, function (err, res){
-  			if (res == 1){
-  				console.log(token + ' es un token no validado');
-  				res.send(200, token + 'es un token no validado' );
-  				resultado = 1;
-  			}			
-  		});
+  		*Validamos si existe token
+  		*resultado =  0: no existe
+  		*             1: existe
+  		*/	
+  		function getTokensValidadas(cb){
+  			let resultado = 0;
+  			redisClient.sismember('tokens_validados', token,(err, reply)=>{
+  				if(reply == 1){
+  					resultado = 1;
+  					res.send(200, token + ' es un token validado' );
+  					return cb({error:true, mesagge: 'es un token validado'});
+  				}else{
+  					return cb(null, resultado);
+  				}
+  			});
+  		},
+  		function getTokensNoValidadas(resultado,cb){
+  			redisClient.sismember("tokens_no_validados", token,(err, reply)=>{
+  				if (reply == 1 ){
+  					resultado = 1;
+  					res.send(200, token + ' es un token no validado');
+  					return cb({error:true, mesagge: 'es un token no validado'});			
+  				}else{
+  					return cb(null, resultado);
+  				}
+  			});
+  		},
+  		function getTokensError(resultado,cb){
+  			redisClient.sismember("tokens_error", token,(err, reply)=>{
+  				if (reply == 1){
+  					res.send(200, token + ' es un token erroneo' );
+  					resultado = 1;
+  					return cb({error:true, mesagge: 'es un token con error'});	
+  				}else{
+  					return cb(null, resultado);
+  				}
+  			});
+  		},
   		/*
-  		* verifica que no existe la fanpage y la agrega
+  		* Si resultado = 0 entonces agrega el token
   		*/
-	    if(resultado == 0){
-  			redisClient.sadd('tokenNoValidados', token);
-  			console.log('se agrego :' + token);
-  			res.send(200, 'se agrego :' + token );
-  		}  
+  		function addToken(resultado,cb){
+	    	if(resultado == 0){
+  				redisClient.sadd('tokens_no_validados', token);
+  					res.send(200, { mesagge: 'se agrego :' + token });
+  			} 
+  		}
+   	]);	     
 });
 
-//listar
+/*
+*                    Listar Tokens
+*                    =============
+*/
 app.get('/v1.0/token/listAll', function (req, res){
 	let arrayTokens = [];
-	redisClient.smembers('tokenValidados',function(err, reply){
+	/*
+	* arrayTokens guardara todos los tokens
+	*/
+	redisClient.smembers('tokens_validados',function(err, reply){
 		arrayTokens= arrayTokens.concat(reply);
 	});
-	redisClient.smembers('tokenErroneos',function(err, reply){
+	redisClient.smembers('tokens_error',function(err, reply){
 		arrayTokens= arrayTokens.concat(reply);
 	});
-	redisClient.smembers('tokenNoValidados',function(err, reply){
-		//devolver json con todos los tokens anteriores
+	redisClient.smembers('tokens_no_validados',function(err, reply){
 		arrayTokens= arrayTokens.concat(reply);
-		console.log(arrayTokens);
+	/*
+	* Devuelve todos los tokens
+	*/
 		res.send(200, {arrayTokens});
 	});
 	
 });
 
+/*
+*               Listar Tokens con error
+*               =======================
+*/
+
 app.get('/v1.0/token/listError', function (req, res){
-	redisClient.smembers('tokenErroneos',function(err, reply){
+	/*
+	* Obtiene los tokens con error
+	*/
+	redisClient.smembers('tokens_error',function(err, reply){
 		res.send(200, {reply});
 	});
 });
 
-//conexion con redis
+/*
+* ----------------------------> conexion con redis <----------------------------------
+*/
+
 var redisClient = redis.createClient({
 	host: 'fbredis'
 });
-
+/*
+*                          conexion con redis y express
+*                          ============================
+*/
 redisClient.on('connect', function() {
     console.log('Conectado a Redis Server');
     app.listen(80, function () {
