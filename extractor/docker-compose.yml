@@ -21,7 +21,7 @@ services:
     networks:
       - fbook
     ports:
-     - "127.0.0.1:8081:80"
+     - "127.0.0.1:7005:7005"
 
 networks:
   fbook:

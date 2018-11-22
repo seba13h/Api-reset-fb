@@ -21,7 +21,7 @@ RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 # Disable cron
 RUN echo manual | tee /etc/init/cron.override
 
-EXPOSE 80
+EXPOSE 7005
 
 VOLUME /home/app/code
 WORKDIR /home/app/code
