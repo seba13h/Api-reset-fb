@@ -24,8 +24,8 @@ app.post('/v1.0/fanpage/add', function (req, res) {
   			let resultado = 0;
   			if(fanpageUrl === undefined || fanpageUrl == ""){
   				resultado = 1;
-  				res.status(500).send(JSON.stringify( {mensaje: 'No ingreso una url valida'}));
-  				return cb({error: true, mesagge: 'url invalida'});	
+  				res.status(500).send(JSON.stringify( {mensaje: ' No ingreso una url valida '}));
+  				return cb({error: true, mesagge: ' url invalida '});	
   			}else{
   				return cb(null, resultado);
   			}
@@ -34,13 +34,13 @@ app.post('/v1.0/fanpage/add', function (req, res) {
   			
   			redisClient.sismember("fanpages_redis", fanpageUrl,(err, reply)=>{
   				if(err){
-  					console.log('\x1b[31m%s\x1b[0m', 'error2 en : ' + JSON.stringify(err));
+  					console.log('\x1b[31m%s\x1b[0m', ' error en : ' + JSON.stringify(err));
   					return cb({ error : true, message : JSON.stringify(err), status : 500}); 
   				}else{
   					if(reply == 1){
   						resultado = 1;
-  						res.status(200).send( JSON.stringify( {mensaje: fanpageUrl + ' es una fanpage validada'}) );
-  						return cb({error:true, mesagge: 'es una fanpage validada'});
+  						res.status(200).send( JSON.stringify( {mensaje: fanpageUrl + ' es una fanpage validada '}) );
+  						return cb({error:true, mesagge: ' es una fanpage validada '});
   					}else{
   						return cb(null, resultado);
   					}
@@ -50,13 +50,13 @@ app.post('/v1.0/fanpage/add', function (req, res) {
   		function getFanpagesNoValidadas(resultado,cb){
   			redisClient.sismember("fanpages_no_validadas", fanpageUrl,(err, reply)=>{
   				if(err){
-  					console.log('\x1b[31m%s\x1b[0m', 'error2 en : ' + JSON.stringify(err));
+  					console.log('\x1b[31m%s\x1b[0m', ' error en : ' + JSON.stringify(err));
   					return cb({ error : true, message : JSON.stringify(err), status : 500});
   				}else{
   					if (reply == 1 ){
   						resultado = 1;
-  						res.status(200).send(JSON.stringify( {mensaje: fanpageUrl + ' es una fanpage no validada'}));
-  						return cb({error:true, mesagge: 'es una fanpage no validada'});			
+  						res.status(200).send(JSON.stringify( {mensaje: fanpageUrl + ' es una fanpage no validada '}));
+  						return cb({error:true, mesagge: ' es una fanpage no validada '});			
   					}else{
   						return cb(null, resultado);
   					}
@@ -70,9 +70,9 @@ app.post('/v1.0/fanpage/add', function (req, res) {
   					return cb({ error : true, message : JSON.stringify(err), status : 500});
   				}else{
   					if (reply == 1){
-  						res.status(200).send(JSON.stringify({mensaje: fanpageUrl + ' es una fanpage erronea'})  );
+  						res.status(200).send(JSON.stringify({mensaje: fanpageUrl + ' es una fanpage erronea '})  );
   						resultado = 1;
-  						return cb({error:true, mesagge: 'es una fanpage con error'});	
+  						return cb({error:true, mesagge: ' es una fanpage con error '});	
   					}else{
   						return cb(null, resultado);
   					}
@@ -86,9 +86,9 @@ app.post('/v1.0/fanpage/add', function (req, res) {
 	    	if(resultado == 0){
   				redisClient.sadd('fanpages_no_validadas', fanpageUrl, (err, reply) =>{
   					if(err){
-  					  console.log('\x1b[31m%s\x1b[0m', 'error2 en : ' + JSON.stringify(err));
+  					  console.log('\x1b[31m%s\x1b[0m', ' error en : ' + JSON.stringify(err));
   					}else{
-  						res.status(200).send(JSON.stringify({ mesagge: 'se agrego :' + fanpageUrl }) );
+  						res.status(200).send(JSON.stringify({ mesagge: ' se agrego : ' + fanpageUrl }) );
   					}
   				});
   				
@@ -106,10 +106,15 @@ app.post('/v1.0/fanpage/delete', function (req, res){
 	async.waterfall([
 		function validarRequest(cb){
   			let resultado = 0;
+  			/*
+  			 * Valida que la fanspage exista o no
+  			 * resultado = 0: no existe
+  			 *             1: existe
+  			 */
   			if(url === undefined || url == ""){
   				resultado = 1;
-  				res.status(500).send(JSON.stringify( {mensaje: 'No ingreso una url valida'}));
-  				return cb({error: true, mesagge: 'url invalida'});	
+  				res.status(500).send(JSON.stringify( {mensaje: ' No ingreso una url valida '}));
+  				return cb({error: true, mesagge: ' url vacia o invalida '});	
   			}else{
   				return cb(null, resultado);
   			}
@@ -117,14 +122,14 @@ app.post('/v1.0/fanpage/delete', function (req, res){
   		function getFanpagesValidadas(resultado,cb){
   			redisClient.sismember("fanpages_redis", url,(err, reply)=>{
   				if(err){
-  					console.log('\x1b[31m%s\x1b[0m', 'error2 en : ' + JSON.stringify(err));
+  					console.log('\x1b[31m%s\x1b[0m', ' error en : ' + JSON.stringify(err));
   					return cb({ error : true, message : JSON.stringify(err), status : 500}); 
   				}else{
   					if(reply == 1){
   						resultado = 1;
-  						res.status(200).send( JSON.stringify( {mensaje: url + ' es una fanpage validada'}) );
+  						res.status(200).send( JSON.stringify( {mensaje: url + ' es una fanpage validada '}) );
   						redisClient.SREM("fanpages_redis", url);
-  						return cb({error:true, mesagge: 'es una fanpage validada'});
+  						return cb({error:true, mesagge: ' es una fanpage validada '});
   					}else{
   						return cb(null, resultado);
   					}
@@ -139,9 +144,9 @@ app.post('/v1.0/fanpage/delete', function (req, res){
   				}else{
   					if (reply == 1 ){
   						resultado = 1;
-  						res.status(200).send(JSON.stringify( {mensaje: url + ' se borro del set fanpage no validada'}));
+  						res.status(200).send(JSON.stringify( {mensaje: url + ' se borro del set fanpage no validada '}));
   						redisClient.SREM("fanpages_no_validadas", url);
-  						return cb({error:true, mesagge: 'se borro una fanpage no validada'});			
+  						return cb({error:true, mesagge: ' se borro una fanpage no validada '});			
   					}else{
   						return cb(null, resultado);
   					}
@@ -151,14 +156,14 @@ app.post('/v1.0/fanpage/delete', function (req, res){
   		function getFanpagesError(resultado,cb){
   			redisClient.sismember("fanpages_error", url,(err, reply)=>{
   				if(err){
-  					console.log('\x1b[31m%s\x1b[0m', 'error2 en : ' + JSON.stringify(err));
+  					console.log('\x1b[31m%s\x1b[0m', ' error en : ' + JSON.stringify(err));
   					return cb({ error : true, message : JSON.stringify(err), status : 500});
   				}else{
   					if (reply == 1){
   						resultado = 1;
   						redisClient.SREM("fanpages_error", url);
   						redisClient.HDEL("descripcion_error", url);
-  						res.status(200).send(JSON.stringify({mensaje:url + 'se borro del set fanpages con error'})  );
+  						res.status(200).send(JSON.stringify({mensaje:url + ' se borro del set fanpages con error '})  );
   					}else{
   						return cb(null, resultado);
   					}
@@ -168,7 +173,7 @@ app.post('/v1.0/fanpage/delete', function (req, res){
   		},
   		function verificarExist(resultado,cb){
   			if (resultado == 0){
-  				res.status(200).send(JSON.stringify({ mesagge: url + ' no existe' }) );	
+  				res.status(200).send(JSON.stringify({ mesagge: url + ' no existe ' }) );	
   			} 
   		}
 	]);	
@@ -179,11 +184,9 @@ app.post('/v1.0/fanpage/delete', function (req, res){
 */ 
 app.get('/v1.0/fanpage/listAll', function (req, res){
 	let arrayFanpages = [];
-	
 	/*
 	 * arrayFanpages = array que contendra todas las fanpages  
 	 */
-
 	redisClient.smembers('fanpages_redis',function(err, reply){
 		if(err){
 			console.log('\x1b[31m%s\x1b[0m', 'error2 en : ' + JSON.stringify(err));
@@ -206,16 +209,14 @@ app.get('/v1.0/fanpage/listAll', function (req, res){
 		/*
 		 * Devolver json de todas las fanpages
 		 */
-			res.status(200).send(arrayFanpages);
+			res.status(200).send({fanpage: arrayFanpages});
 		}
 	});		
 });
-
 /*
 *               Listar fanpages con error
 *               =========================
 */
-
 app.get('/v1.0/fanpage/listError', function (req, res){
 	let arrayFanpages = [];
 	let arrayFanpagesError = [];
@@ -226,7 +227,7 @@ app.get('/v1.0/fanpage/listError', function (req, res){
 		function getFanpagesError(cb){
 			redisClient.smembers('fanpages_error',(err, reply)=>{
 				if(err){
-					console.log('\x1b[31m%s\x1b[0m', 'error2 en : ' + JSON.stringify(err));
+					console.log('\x1b[31m%s\x1b[0m', 'error en : ' + JSON.stringify(err));
 					return cb ({error: true, mesagge: JSON.stringify(err), status : 500})
 				}else{
 					arrayFanpages= arrayFanpages.concat(reply);
@@ -241,23 +242,26 @@ app.get('/v1.0/fanpage/listError', function (req, res){
 			 * traemos los errores guardados en el hash 'errores_fanpages' de cada key (fan page con error)
 			 * los resultados se van guardando en arrayFanpagesError
 			 */
-			arrayFanpages.forEach(function(key){
-				redisClient.hget('descripcion_error', key,(err, reply)=>{
-					if(err){
-						console.log('\x1b[31m%s\x1b[0m', 'error2 en : ' + JSON.stringify(err));
-					}else{
-						arrayFanpagesError= arrayFanpagesError.concat({id: key, descrion_error: reply});	
-						cont = cont + 1 ;
-						if(cont === arrayFanpages.length){
-							/*
-							 * Devolver json de las fp con error
-							 */
-							res.status(200).send(arrayFanpagesError);	
-						}	
-					}
-				});
-				
-			});
+      if(arrayFanpages.length == 0){
+        res.status(200).send({message: "No hay ninguna fanpage con error"}); 
+      } else{
+			  arrayFanpages.forEach(function(key){
+			    redisClient.hget('descripcion_error', key,(err, reply)=>{
+					  if(err){
+						        console.log('\x1b[31m%s\x1b[0m', ' error en2 : ' + JSON.stringify(err));
+            }else{
+					    arrayFanpagesError= arrayFanpagesError.concat({id: key, descrion_error: reply});	
+						  cont = cont + 1 ;
+						  if(cont === arrayFanpages.length){
+				       /*
+                * Devolver json de las fp con error
+						    */		 
+                res.status(200).send({fanpage: arrayFanpagesError});	
+				      }	
+			      }
+				  });
+		    });
+      }
 		}
 	]);
 });
@@ -274,19 +278,17 @@ app.get('/v1.0/fanpage/listNoError', function (req, res){
 	 */
 	redisClient.smembers('fanpages_redis',function(err, reply){
 		if(err){
-			console.log('\x1b[31m%s\x1b[0m', 'error2 en : ' + JSON.stringify(err));
+			console.log('\x1b[31m%s\x1b[0m', ' error en : ' + JSON.stringify(err));
 		}else{
 			arrayFanpages= arrayFanpages.concat(reply);
-			res.status(200).send(arrayFanpages);
+			res.status(200).send({fanpage: arrayFanpages});
 		}
 	});
 });
-
 /*
  *                 Lista las fanpages no validadas
  *                 ===============================
  */
-
 app.get('/v1.0/fanpage/listUnvalidated', function (req, res){
 	let fanpages = [];
 	redisClient.smembers('fanpages_no_validadas',function(err, reply){
@@ -297,18 +299,16 @@ app.get('/v1.0/fanpage/listUnvalidated', function (req, res){
 		 * Devuelve un json con las fanspages sin validar
 		 */
 		 	fanpages = fanpages.concat(reply);
-			res.status(200).send(fanpages);
+			res.status(200).send({fanpage: fanpages});
 		}
 	});
 });
-
 /*
  *----------------------> End point tokens <--------------------------------
  *
  *                          Agregar token
  *                          =============
  */
-
 app.post('/v1.0/token/add', function (req, res) {
   
   let token = req.body.token;
@@ -322,8 +322,8 @@ app.post('/v1.0/token/add', function (req, res) {
   			let resultado = 0;
   			if(token === undefined || token == ""){
   				resultado = 1;
-  				res.status(500).send(JSON.stringify( {mensaje: 'No ingreso un token valido'}));
-  				return cb({error: true, mesagge: 'token invalida'});	
+  				res.status(500).send(JSON.stringify( {mensaje: ' No ingreso un token valido '}));
+  				return cb({error: true, mesagge: ' token invalida '});	
   			}else{
   				return cb(null, resultado);
   			}
@@ -336,8 +336,8 @@ app.post('/v1.0/token/add', function (req, res) {
   				}else{
   					if(reply == 1){
   						resultado = 1;
-  						res.status(200).send(token + ' es un token validado' );
-  						return cb({error:true, mesagge: 'es un token validado'});
+  						res.status(200).send(token + ' es un token validado ' );
+  						return cb({error:true, mesagge: ' es un token validado '});
   					}else{
   						return cb(null, resultado);
   					}
@@ -352,8 +352,8 @@ app.post('/v1.0/token/add', function (req, res) {
   				}else{
   					if (reply == 1 ){
   						resultado = 1;
-  						res.status(200).send(JSON.stringify({ mensaje: token + ' es un token no validado' }) );
-  						return cb({error:true, mesagge: 'es un token no validado'});			
+  						res.status(200).send(JSON.stringify({ mensaje: token + ' es un token no validado ' }) );
+  						return cb({error:true, mesagge: ' es un token no validado '});			
   					}else{
   						return cb(null, resultado);
   					}
@@ -367,9 +367,9 @@ app.post('/v1.0/token/add', function (req, res) {
   					return cb({ error : true, message : JSON.stringify(err), status : 500}); 
   				}else{
   					if (reply == 1){
-  						res.status(200).send(JSON.stringify({ mensaje: token + ' es un token con error' }) );
+  						res.status(200).send(JSON.stringify({ mensaje: token + ' es un token con error ' }) );
   						resultado = 1;
-  						return cb({error:true, mesagge: 'es un token con error'});	
+  						return cb({error:true, mesagge: ' es un token con error '});	
   					}else{
   						return cb(null, resultado);
   					}
@@ -383,9 +383,9 @@ app.post('/v1.0/token/add', function (req, res) {
 	    	if(resultado == 0){
   				redisClient.sadd('tokens_no_validados', token, (err, reply)=>{
   					if(err){
-  						console.log('\x1b[31m%s\x1b[0m', 'error2 en : ' + JSON.stringify(err));
+  						console.log('\x1b[31m%s\x1b[0m', ' error2 en : ' + JSON.stringify(err));
   					}else{
-  						res.status(200).send({ mesagge: 'se agrego :' + token });
+  						res.status(200).send({ mesagge: ' se agrego : ' + token });
   					}
   				});	
   			} 
@@ -424,7 +424,7 @@ app.get('/v1.0/token/listAll', function (req, res){
 	/*
 	 * Devuelve todos los tokens
 	 */
-			res.status(200).send(arrayTokens);
+			res.status(200).send({tokens: arrayTokens});
 		}
 	});
 	
@@ -443,7 +443,7 @@ app.get('/v1.0/token/listError', function (req, res){
 		if(err){
 			console.log('\x1b[31m%s\x1b[0m', 'error2 en : ' + JSON.stringify(err));
 		}else{
-			res.status(200).send(reply);
+			res.status(200).send({tokens: reply});
 		}
 	});
 });
@@ -460,19 +460,18 @@ var redisClient = redis.createClient({
  *                          ============================
  */
 redisClient.on('connect', function() {
-    console.log('\x1b[36m%s\x1b[0m','Conectado a Redis Server');
+    console.log(' \x1b[36m%s\x1b[0m','Conectado a Redis Server ');
     app.listen(7005, function (err, body) {
     	if(err){
-    		console.log(JSON.stringify(err));
+    		console.log( JSON.stringify(err) );
     	}else{
-  		console.log('\x1b[35m%s\x1b[0m','Server listening on port 7005');
+  		console.log(' \x1b[35m%s\x1b[0m','Server listening on port 7005 ');
   		}
 	});
 });
 
 redisClient.on('error', function (err) {
-    console.log('Something went wrong ' + err);
+    console.log(' Algo salio mal ' + err);
 });
-
 
 module.exports = app; //for testing

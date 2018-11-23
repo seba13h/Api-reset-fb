@@ -19,10 +19,14 @@ chai.use(chaiHttp);
 				.get('/v1.0/fanpage/listAll')
 				.set('accept', 'application/json')
 				.end((err, res) => {
-                  res.should.have.status(200);
-                  res.body.should.be.a('array');
-                  //console.log(res.body);
-              	done();
+				if(err){
+					console.log('\x1b[31m%s\x1b[0m', 'error2 en : ' + JSON.stringify(err));
+				}else{	
+                  	res.should.have.status(200);
+                  	res.body.should.be.a('object');
+                  	//console.log(res.body);
+              		done();
+              	}
               });
 		})
 
@@ -31,10 +35,14 @@ chai.use(chaiHttp);
 				.get('/v1.0/fanpage/listError')
 				.set('accept', 'application/json')
 				.end((err, res) => {
-                  res.should.have.status(200);
-                  res.body.should.be.a('array');
-                  //console.log(res.body);
-              	done();
+				  if(err){
+				  	console.log('\x1b[31m%s\x1b[0m', 'error en : ' + JSON.stringify(err));
+				  }else{	
+                  	res.should.have.status(200);
+                  	res.body.should.be.a('object');
+                  	console.log(res.body);
+              	   	done();
+              	  }
               });
 		})
 		it('List No Error fanpage', (done)=> {
@@ -42,10 +50,14 @@ chai.use(chaiHttp);
 				.get('/v1.0/fanpage/listNoError')
 				.set('accept', 'application/json')
 				.end((err, res) => {
-                  res.should.have.status(200);
-                  res.body.should.be.a('array');
-                  //console.log(res.body);
-              	done();
+				  if(err){
+				  	console.log('\x1b[31m%s\x1b[0m', 'error2 en : ' + JSON.stringify(err));
+				  }else{		
+                  	res.should.have.status(200);
+                  	res.body.should.be.a('object');
+                 	//console.log(res.body);
+              		done();
+              	  }	
               });
 		})
 		it('List fanpage no validadas', (done)=> {
@@ -53,10 +65,14 @@ chai.use(chaiHttp);
 				.get('/v1.0/fanpage/listUnvalidated')
 				.set('accept', 'application/json')
 				.end((err, res) => {
-                  res.should.have.status(200);
-                  res.body.should.be.a('array');
-                  //console.log(res.body);
-              	done();
+					if(err){
+						console.log('\x1b[31m%s\x1b[0m', 'error2 en : ' + JSON.stringify(err));
+					}else{
+						res.should.have.status(200);
+                  		res.body.should.be.a('object');
+                 		//console.log(res.body);
+              			done();
+					}
               });
 		})
 
@@ -74,10 +90,14 @@ chai.use(chaiHttp);
 			    .post('/v1.0/fanpage/add')
 			    .send(fanpage)
 			    .end((err, res)=>{
-			    	res.should.have.status(200);
-                  	res.body.should.be.a('object');
-            		//console.log(res.body);
-            	done();	
+			    	if(err){
+						console.log('\x1b[31m%s\x1b[0m', 'error2 en : ' + JSON.stringify(err));
+			    	}else{
+			    		res.should.have.status(200);
+                  		res.body.should.be.a('object');
+            			//console.log(res.body);
+            			done();
+            		}	
 			    })
 		})
 		it('eleminar fanpage', (done)=> {
@@ -89,10 +109,14 @@ chai.use(chaiHttp);
 			    .post('/v1.0/fanpage/delete')
 			    .send(fanpage)
 			    .end((err, res)=>{
-			    	res.should.have.status(200);
-                  	res.body.should.be.a('object');
-            		//console.log(res.body);
-            	done();	
+			    	if(err){
+			    		console.log('\x1b[31m%s\x1b[0m', 'error2 en : ' + JSON.stringify(err));
+			    	}else{
+			    		res.should.have.status(200);
+                  		res.body.should.be.a('object');
+            			//console.log(res.body);
+            			done();
+            		}	
 			    })
 		})
 	})
@@ -108,10 +132,14 @@ chai.use(chaiHttp);
 				.get('/v1.0/token/listAll')
 				.set('accept', 'application/json')
 				.end((err, res) => {
-                  res.should.have.status(200);
-                  res.body.should.be.a('array');
-                  //console.log(res.body);
-              	done();
+               	if(err){
+               		console.log('\x1b[31m%s\x1b[0m', 'error2 en : ' + JSON.stringify(err));
+               	}else{
+                  	res.should.have.status(200);
+                  	res.body.should.be.a('object');
+                  	//console.log(res.body);
+              		done();
+              	}
               });
 		})
 
@@ -120,10 +148,14 @@ chai.use(chaiHttp);
 				.get('/v1.0/token/listError')
 				.set('accept','application/json')
 				.end((err, res) => {
-                  res.should.have.status(200);
-                  res.body.should.be.a('array');
-                  //console.log(res.body);
-              	done();
+					if(err){
+						console.log('\x1b[31m%s\x1b[0m', 'error2 en : ' + JSON.stringify(err));
+					}else{	
+                  		res.should.have.status(200);
+                  		res.body.should.be.a('object');
+                  		//console.log(res.body);
+              			done();
+              		}	
               });
 		})
 	})
@@ -142,10 +174,14 @@ chai.use(chaiHttp);
 			    .post('/v1.0/token/add')
 			    .send(token)
 			    .end((err, res)=>{
-			    	res.should.have.status(200);
-                  	res.body.should.be.a('object');
-            		//console.log(res.body);
-            	done();	
+			    	if(err){
+			    		console.log('\x1b[31m%s\x1b[0m', 'error2 en : ' + JSON.stringify(err));
+			    	}else{
+			    		res.should.have.status(200);
+                  		res.body.should.be.a('object');
+            			//console.log(res.body);
+            			done();
+            		}	
 			    })
 		})
 	})
