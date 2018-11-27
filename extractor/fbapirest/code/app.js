@@ -31,7 +31,6 @@ app.post('/v1.0/fanpage/add', function (req, res) {
   			}
   		},	
   		function getFanpagesValidadas(resultado,cb){
-  			
   			redisClient.sismember("fanpages_redis", fanpageUrl,(err, reply)=>{
   				if(err){
   					console.log('\x1b[31m%s\x1b[0m', ' error en : ' + JSON.stringify(err));

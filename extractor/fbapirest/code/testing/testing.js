@@ -159,8 +159,6 @@ chai.use(chaiHttp);
               });
 		})
 	})
-
-
  /*
   * ADD TOKEN
   */	
