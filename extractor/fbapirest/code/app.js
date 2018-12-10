@@ -97,7 +97,6 @@ app.post('/v1.0/fanpage/add', function (req, res) {
         } 
       }
     ]);     
->>>>>>> developer
 });
 /*
  *                      Elimina Fanpage
@@ -348,6 +347,22 @@ app.post('/v1.0/token/add', function (req, res) {
           }
         });
       },
+      function getTokensReservados(resultado,cb){
+        redisClient.sismember('tokens_reservados', token,(err, reply)=>{
+          if(err){
+            console.log('\x1b[31m%s\x1b[0m', 'error2 en : ' + JSON.stringify(err));
+            return cb({ error : true, message : JSON.stringify(err), status : 500}); 
+          }else{
+            if(reply == 1){
+              resultado = 1;
+              res.status(200).send(token + ' es un token reservado ' );
+              return cb({error:true, mesagge: ' es un token reservado '});
+            }else{
+              return cb(null, resultado);
+            }
+          }
+        });
+      },
       function getTokensNoValidadas(resultado,cb){
         redisClient.sismember("tokens_no_validados", token,(err, reply)=>{
           if(err){
@@ -407,6 +422,13 @@ app.get('/v1.0/token/listAll', function (req, res){
    * arrayTokens guardara todos los tokens
    */
   redisClient.smembers('tokens_validados',function(err, reply){
+    if(err){
+      console.log('\x1b[31m%s\x1b[0m', 'error2 en : ' + JSON.stringify(err));
+    }else{
+      arrayTokens= arrayTokens.concat(reply);
+    }
+  });
+   redisClient.smembers('tokens_reservados',function(err, reply){
     if(err){
       console.log('\x1b[31m%s\x1b[0m', 'error2 en : ' + JSON.stringify(err));
     }else{
