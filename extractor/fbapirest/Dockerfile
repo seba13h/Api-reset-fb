@@ -16,6 +16,8 @@ RUN /pd_build/nodejs.sh
 
 RUN apt-get install -y nano
 
+RUN npm install pm2 -g 
+
 RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 # Disable cron
