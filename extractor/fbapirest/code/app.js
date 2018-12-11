@@ -23,7 +23,6 @@ app.post('/v1.0/fanpage/add', function (req, res) {
        */
       function validarRequest(cb){
         let resultado = 0;
-        console.log(fanpageUrl.length);
         if(fanpageUrl === undefined || fanpageUrl == "" || fanpageUrl.length < 2){
           resultado = 1;
           res.status(500).send(JSON.stringify( {mensaje: ' No ingreso una url valida '}));
@@ -34,7 +33,7 @@ app.post('/v1.0/fanpage/add', function (req, res) {
       },  
       function getFanpagesValidadas(resultado,cb){
         
-        redisClient.sismember("fanpages_redis", fanpageUrl,(err, reply)=>{
+        redisClient.sismember("fanpages_validadas", fanpageUrl,(err, reply)=>{
           if(err){
             console.log('\x1b[31m%s\x1b[0m', ' error en : ' + JSON.stringify(err));
             return cb({ error : true, message : JSON.stringify(err), status : 500}); 
@@ -122,7 +121,7 @@ app.post('/v1.0/fanpage/delete', function (req, res){
         }
       },  
       function getFanpagesValidadas(resultado,cb){
-        redisClient.sismember("fanpages_redis", url,(err, reply)=>{
+        redisClient.sismember("fanpages_validadas", url,(err, reply)=>{
           if(err){
             console.log('\x1b[31m%s\x1b[0m', ' error en : ' + JSON.stringify(err));
             return cb({ error : true, message : JSON.stringify(err), status : 500}); 
@@ -189,7 +188,7 @@ app.get('/v1.0/fanpage/listAll', function (req, res){
   /*
    * arrayFanpages = array que contendra todas las fanpages  
    */
-  redisClient.smembers('fanpages_redis',function(err, reply){
+  redisClient.smembers('fanpages_validadas',function(err, reply){
     if(err){
       console.log('\x1b[31m%s\x1b[0m', 'error2 en : ' + JSON.stringify(err));
     }else{
@@ -278,7 +277,7 @@ app.get('/v1.0/fanpage/listNoError', function (req, res){
   /*
    * arrayFanpages contendra las fanpage sin error
    */
-  redisClient.smembers('fanpages_redis',function(err, reply){
+  redisClient.smembers('fanpages_validadas',function(err, reply){
     if(err){
       console.log('\x1b[31m%s\x1b[0m', ' error en : ' + JSON.stringify(err));
     }else{
