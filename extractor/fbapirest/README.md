@@ -1,4 +1,5 @@
 1.- Instalar:
+ --------------
 
 Crear la imagen:
 
